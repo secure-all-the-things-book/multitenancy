@@ -14,17 +14,14 @@ import org.springframework.web.client.RestClient;
 @SpringBootApplication
 public class ClientApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ClientApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(ClientApplication.class, args);
+	}
 
-    @Bean
-    OAuth2TenantResolver oAuth2TenantResolver() {
-        return OAuth2TenantResolver
-                .builder()
-                .tenantClaimName("tenant")
-                .build();
-    }
+	@Bean
+	OAuth2TenantResolver oAuth2TenantResolver() {
+		return OAuth2TenantResolver.builder().tenantClaimName("tenant").build();
+	}
 
 }
 
@@ -32,23 +29,21 @@ public class ClientApplication {
 @ResponseBody
 class ClientController {
 
-    private final RestClient http;
+	private final RestClient http;
 
-    ClientController(RestClient.Builder http) {
-        this.http = http.build();
-    }
+	ClientController(RestClient.Builder http) {
+		this.http = http.build();
+	}
 
-    @GetMapping("/")
-    TenantInfo me(@RegisteredOAuth2AuthorizedClient("spring") OAuth2AuthorizedClient auth2AuthorizedClient) {
-        return this.http
-                .get()
-                .uri("http://localhost:8081")
-                .headers(h -> h
-                        .setBearerAuth(auth2AuthorizedClient.getAccessToken()
-                               .getTokenValue()))
-                .retrieve()
-                .body(TenantInfo.class);
-    }
+	@GetMapping("/")
+	TenantInfo me(@RegisteredOAuth2AuthorizedClient("spring") OAuth2AuthorizedClient auth2AuthorizedClient) {
+		return this.http.get()
+			.uri("http://localhost:8081")
+			.headers(h -> h.setBearerAuth(auth2AuthorizedClient.getAccessToken().getTokenValue()))
+			.retrieve()
+			.body(TenantInfo.class);
+	}
+
 }
 
 record TenantInfo(String tenant, String user) {

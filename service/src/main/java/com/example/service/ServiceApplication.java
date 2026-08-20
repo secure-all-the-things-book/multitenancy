@@ -15,17 +15,14 @@ import java.util.Map;
 @SpringBootApplication
 public class ServiceApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ServiceApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(ServiceApplication.class, args);
+	}
 
-    @Bean
-    OAuth2TenantResolver oauth2TenantResolver() {
-        return OAuth2TenantResolver
-                .builder()
-                 .tenantClaimName("tenant")
-                .build();
-    }
+	@Bean
+	OAuth2TenantResolver oauth2TenantResolver() {
+		return OAuth2TenantResolver.builder().tenantClaimName("tenant").build();
+	}
 
 }
 
@@ -33,12 +30,10 @@ public class ServiceApplication {
 @ResponseBody
 class TenantController {
 
-    @GetMapping("/")
-    Map<String, String> me() {
-        return Map.of("tenant", TenantContext.getTenantIdentifier(),
-                "user", SecurityContextHolder.getContextHolderStrategy()
-                        .getContext()
-                        .getAuthentication()
-                        .getName());
-    }
+	@GetMapping("/")
+	Map<String, String> me() {
+		return Map.of("tenant", TenantContext.getTenantIdentifier(), "user",
+				SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication().getName());
+	}
+
 }

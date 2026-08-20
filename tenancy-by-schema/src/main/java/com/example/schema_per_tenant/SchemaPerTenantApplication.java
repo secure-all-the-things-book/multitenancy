@@ -27,33 +27,32 @@ import java.util.concurrent.ConcurrentHashMap;
 @SpringBootApplication
 public class SchemaPerTenantApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(SchemaPerTenantApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(SchemaPerTenantApplication.class, args);
+	}
 
-    @Bean
-    static SchemaPerTenantDataSourcePostProcessor dataSourcePostProcessor() {
-        return new SchemaPerTenantDataSourcePostProcessor();
-    }
+	@Bean
+	static SchemaPerTenantDataSourcePostProcessor dataSourcePostProcessor() {
+		return new SchemaPerTenantDataSourcePostProcessor();
+	}
+
 }
 
 @Controller
 @ResponseBody
 class CustomersController {
 
-    private final JdbcClient db;
+	private final JdbcClient db;
 
-    CustomersController(JdbcClient db) {
-        this.db = db;
-    }
+	CustomersController(JdbcClient db) {
+		this.db = db;
+	}
 
-    @GetMapping("/customers")
-    Collection<Customer> customers() {
-        return this.db
-                .sql("select * from customer")
-                .query(Customer.class)
-                .list();
-    }
+	@GetMapping("/customers")
+	Collection<Customer> customers() {
+		return this.db.sql("select * from customer").query(Customer.class).list();
+	}
+
 }
 
 record Customer(String name, int id) {
@@ -61,63 +60,64 @@ record Customer(String name, int id) {
 
 class SchemaPerTenantDataSourcePostProcessor implements BeanPostProcessor {
 
-    @Override
-    public @Nullable Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        if (bean instanceof DataSource dataSource) {
-            return new SchemaPerTenantDataSource(dataSource);
-        }
-        return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
-    }
+	@Override
+	public @Nullable Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		if (bean instanceof DataSource dataSource) {
+			return new SchemaPerTenantDataSource(dataSource);
+		}
+		return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
+	}
+
 }
 
 @Component
 class SchemaTenantContextAttachedEventListener {
 
-    private final DataSource dataSource;
+	private final DataSource dataSource;
 
-    private final Map<String, Boolean> tenantsInitialized = new ConcurrentHashMap<>();
+	private final Map<String, Boolean> tenantsInitialized = new ConcurrentHashMap<>();
 
-    SchemaTenantContextAttachedEventListener(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+	SchemaTenantContextAttachedEventListener(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
 
-    @EventListener
-    void on(TenantContextAttachedEvent tca) {
-        if (!this.tenantsInitialized.computeIfAbsent(tca.getTenantIdentifier(), k -> false)) {
-            Flyway
-                    .configure(getClass().getClassLoader())
-                    .locations("classpath:db/tenants/migration/common",
-                            "classpath:db/tenants/migration/s" + tca.getTenantIdentifier())
-                    .dataSource(this.dataSource)
-                    .load()
-                    .migrate();
-            this.tenantsInitialized.put(tca.getTenantIdentifier(), true);
-        }
-    }
+	@EventListener
+	void on(TenantContextAttachedEvent tca) {
+		if (!this.tenantsInitialized.computeIfAbsent(tca.getTenantIdentifier(), k -> false)) {
+			Flyway.configure(getClass().getClassLoader())
+				.locations("classpath:db/tenants/migration/common",
+						"classpath:db/tenants/migration/s" + tca.getTenantIdentifier())
+				.dataSource(this.dataSource)
+				.load()
+				.migrate();
+			this.tenantsInitialized.put(tca.getTenantIdentifier(), true);
+		}
+	}
+
 }
-
 
 class SchemaPerTenantDataSource extends DelegatingDataSource {
 
-    SchemaPerTenantDataSource(DataSource dataSource) {
-        super(dataSource);
-    }
+	SchemaPerTenantDataSource(DataSource dataSource) {
+		super(dataSource);
+	}
 
-    @Override
-    public Connection getConnection(String username, String password) throws SQLException {
-        var connection = super.getConnection(username, password);
-        connection.setSchema(schemaForTenant());
-        return connection;
-    }
+	@Override
+	public Connection getConnection(String username, String password) throws SQLException {
+		var connection = super.getConnection(username, password);
+		connection.setSchema(schemaForTenant());
+		return connection;
+	}
 
-    @Override
-    public Connection getConnection() throws SQLException {
-        var connection = super.getConnection();
-        connection.setSchema(schemaForTenant());
-        return connection;
-    }
+	@Override
+	public Connection getConnection() throws SQLException {
+		var connection = super.getConnection();
+		connection.setSchema(schemaForTenant());
+		return connection;
+	}
 
-    private static String schemaForTenant() {
-        return "schema_" + TenantContext.getTenantIdentifier();
-    }
+	private static String schemaForTenant() {
+		return "schema_" + TenantContext.getTenantIdentifier();
+	}
+
 }

@@ -23,54 +23,48 @@ import java.util.Objects;
 @SpringBootApplication
 public class AuthApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(AuthApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(AuthApplication.class, args);
+	}
 
-    @Bean
-    Customizer<HttpSecurity> customizer() {
-        return http ->
-                http.oauth2AuthorizationServer(a -> a
-                        .oidc(Customizer.withDefaults()));
-    }
+	@Bean
+	Customizer<HttpSecurity> customizer() {
+		return http -> http.oauth2AuthorizationServer(a -> a.oidc(Customizer.withDefaults()));
+	}
 
-    @Bean
-    JdbcUserDetailsManager jdbcUserDetailsManager(DataSource dataSource) {
-        var u = new JdbcUserDetailsManager(dataSource);
-        u.setEnableUpdatePassword(true);
-        return u;
-    }
+	@Bean
+	JdbcUserDetailsManager jdbcUserDetailsManager(DataSource dataSource) {
+		var u = new JdbcUserDetailsManager(dataSource);
+		u.setEnableUpdatePassword(true);
+		return u;
+	}
 
-    @Bean
-    JdbcTenantDetailsService jdbcTenantDetails(DataSource dataSource) {
-        return JdbcTenantDetailsService
-                .builder()
-                .dataSource(dataSource)
-                .build();
-    }
+	@Bean
+	JdbcTenantDetailsService jdbcTenantDetails(DataSource dataSource) {
+		return JdbcTenantDetailsService.builder().dataSource(dataSource).build();
+	}
+
 }
 
 @Component
 class TenantOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
-    private final JdbcClient db;
+	private final JdbcClient db;
 
-    TenantOAuth2TokenCustomizer(JdbcClient db) {
-        this.db = db;
-    }
+	TenantOAuth2TokenCustomizer(JdbcClient db) {
+		this.db = db;
+	}
 
-    @Override
-    public void customize(JwtEncodingContext context) {
-        var tenant = db
-                .sql("""
-                            select tenant_details_identifier from 
-                           users_tenant_details utd  where users_username = ? 
-                        """)
-                .params(context.getPrincipal().getName())
-                .query((rs, rowNum) -> rs.getString("tenant_details_identifier"))
-                .single();
-        context.getClaims().claim("tenant", tenant);
-    }
+	@Override
+	public void customize(JwtEncodingContext context) {
+		var tenant = db.sql("""
+				    select tenant_details_identifier from
+				   users_tenant_details utd  where users_username = ?
+				""")
+			.params(context.getPrincipal().getName())
+			.query((rs, rowNum) -> rs.getString("tenant_details_identifier"))
+			.single();
+		context.getClaims().claim("tenant", tenant);
+	}
+
 }
-
-
