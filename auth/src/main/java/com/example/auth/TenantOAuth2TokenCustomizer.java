@@ -8,22 +8,22 @@ import org.springframework.stereotype.Component;
 @Component
 class TenantOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
-    private final JdbcClient db;
+	private final JdbcClient db;
 
-    TenantOAuth2TokenCustomizer(JdbcClient db) {
-        this.db = db;
-    }
+	TenantOAuth2TokenCustomizer(JdbcClient db) {
+		this.db = db;
+	}
 
-    @Override
-    public void customize(JwtEncodingContext context) {
-        var tenant = db.sql("""
+	@Override
+	public void customize(JwtEncodingContext context) {
+		var tenant = db.sql("""
 				    select tenant_details_identifier from
 				   users_tenant_details utd  where users_username = ?
 				""")
-                .params(context.getPrincipal().getName())
-                .query((rs, rowNum) -> rs.getString("tenant_details_identifier"))
-                .single();
-        context.getClaims().claim("tenant", tenant);
-    }
+			.params(context.getPrincipal().getName())
+			.query((rs, rowNum) -> rs.getString("tenant_details_identifier"))
+			.single();
+		context.getClaims().claim("tenant", tenant);
+	}
 
 }

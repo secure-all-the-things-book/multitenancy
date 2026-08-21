@@ -10,16 +10,17 @@ import java.util.Collection;
 @Transactional
 class CustomerRepository {
 
-    private final JdbcClient jdbcClient;
+	private final JdbcClient jdbcClient;
 
-    CustomerRepository(JdbcClient jdbcClient) {
-        this.jdbcClient = jdbcClient;
-    }
+	CustomerRepository(JdbcClient jdbcClient) {
+		this.jdbcClient = jdbcClient;
+	}
 
-    Collection<Customer> findAll() {
-        return this.jdbcClient //
-                .sql(" select * from customer ")//
-                .query((rs, _) -> new Customer(rs.getInt("id"), rs.getString("name")))//
-                .list();
-    }
+	Collection<Customer> findAll() {
+		return this.jdbcClient //
+			.sql(" select * from customer ")//
+			.query((rs, _) -> new Customer(rs.getInt("id"), rs.getString("name")))//
+			.list();
+	}
+
 }

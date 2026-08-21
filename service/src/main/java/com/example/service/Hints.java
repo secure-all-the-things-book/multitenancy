@@ -9,8 +9,9 @@ import javax.sql.XADataSource;
 
 class Hints implements RuntimeHintsRegistrar {
 
-    @Override
-    public void registerHints(RuntimeHints hints, @Nullable ClassLoader classLoader) {
-        hints.proxies().registerJdkProxy(XADataSource.class, DataSource.class);
-    }
+	@Override
+	public void registerHints(RuntimeHints hints, @Nullable ClassLoader classLoader) {
+		hints.proxies().registerJdkProxy(XADataSource.class, DataSource.class);
+	}
+
 }
