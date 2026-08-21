@@ -2,6 +2,7 @@ package com.example.service.db;
 
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.transport.DockerHttpClient;
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,12 @@ class DataSourceConfiguration {
 	@Bean
 	DockerClientConfig dockerClientConfig() {
 		return DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+	}
+
+	@Bean
+	DockerComposeTenantAwareDataSourceSupplier composeTenantAwareDataSourceSupplier(DockerHttpClient dockerHttpClient,
+			DockerClientConfig dockerClientConfig) {
+		return new DockerComposeTenantAwareDataSourceSupplier(dockerHttpClient, dockerClientConfig);
 	}
 
 }

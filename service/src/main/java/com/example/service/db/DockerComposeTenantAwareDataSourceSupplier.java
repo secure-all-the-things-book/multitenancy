@@ -19,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * dynamically from a registry populated by information from the local Docker instance. We
  * could as easily use soemthing like Eureka, Consul, LDAP, etc.
  */
-@Component
 class DockerComposeTenantAwareDataSourceSupplier implements TenantAwareDataSourceSupplier, InitializingBean {
 
 	private final Map<String, String> registry = new ConcurrentHashMap<>();
