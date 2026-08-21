@@ -1,0 +1,37 @@
+services:
+
+  main:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=mydatabase'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=myuser'
+    ports:
+      - '5432:5432'
+
+  petclinic:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=petclinic'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=myuser'
+    ports:
+      - '5432'
+
+  coffeeshop:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=coffeeshop'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=myuser'
+    ports:
+      - '5432'
+
+  acmewidgets:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=acmewidgets'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=myuser'
+    ports:
+      - '5432'
