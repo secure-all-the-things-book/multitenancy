@@ -25,7 +25,7 @@ class DockerDatabaseRegistry implements DatabaseRegistry, InitializingBean {
 	}
 
 	@Override
-	public JdbcConnectionDetails get(String tenantId) {
+	public JdbcConnectionDetails getDatasourceConnectionDetails(String tenantId) {
 		return new JdbcConnectionDetails() {
 			@Override
 			public @Nullable String getUsername() {

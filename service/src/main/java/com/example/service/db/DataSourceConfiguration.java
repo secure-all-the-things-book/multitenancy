@@ -9,10 +9,12 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 import java.util.function.Function;
 
+@Profile("db")
 @Configuration
 class DataSourceConfiguration {
 
@@ -32,7 +34,7 @@ class DataSourceConfiguration {
 	TenantAwareDataSourceSupplier tenantAwareDataSourceSupplier(DockerDatabaseRegistry dockerDatabaseRegistry) {
 		return _ -> {
 			var stringDataSourceFunction = (Function<String, DataSource>) tenantId -> {
-				var url = dockerDatabaseRegistry.get(tenantId);
+				var url = dockerDatabaseRegistry.getDatasourceConnectionDetails(tenantId);
 				return DataSourceBuilder.create()
 					.url(url.getJdbcUrl())
 					.username(url.getUsername())
