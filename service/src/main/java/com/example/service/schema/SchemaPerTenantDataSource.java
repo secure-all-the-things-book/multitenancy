@@ -28,7 +28,7 @@ class SchemaPerTenantDataSource extends DelegatingDataSource {
 	private Connection doInit(Connection connection, String schemaName) throws SQLException {
 		try (var connectionDetailsDataSource = new SingleConnectionDataSource(connection, true)) {
 			var jdbc = JdbcClient.create(connectionDetailsDataSource);
-			jdbc.sql("CREATE SCHEMA IF NOT EXISTS  " + schemaName);
+			jdbc.sql("CREATE SCHEMA IF NOT EXISTS  " + schemaName).update();
 		}
 		connection.setSchema(schemaName);
 		return connection;
