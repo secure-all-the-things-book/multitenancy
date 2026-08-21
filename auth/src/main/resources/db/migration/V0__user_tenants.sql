@@ -36,7 +36,8 @@ create table if not exists users_tenant_details
     primary key (users_username, tenant_details_identifier)
 );
 
-insert into tenant_details (identifier) values ('tenant2'), ('tenant1'), ('tenant0');
+
+insert into tenant_details (identifier) values ('acmewidgets'), ('coffeeshop'), ('petclinic');
 
 insert into tenant_details_attributes (tenant_id, attribute_name, attribute_value)
 select id, 'tier', 'xl' from tenant_details
@@ -86,10 +87,10 @@ insert into authorities (username, authority) values ('rob', 'ROLE_USER');
 insert into authorities (username, authority) values ('dashaun', 'ROLE_USER');
 
 
-insert into users_tenant_details (users_username, tenant_details_identifier) values ('catherine', 'tenant0');
-insert into users_tenant_details (users_username, tenant_details_identifier) values ('josh', 'tenant2');
-insert into users_tenant_details (users_username, tenant_details_identifier) values ('mala', 'tenant1');
-insert into users_tenant_details (users_username, tenant_details_identifier) values ('trisha', 'tenant0');
-insert into users_tenant_details (users_username, tenant_details_identifier) values ('james', 'tenant1');
-insert into users_tenant_details (users_username, tenant_details_identifier) values ('rob', 'tenant2');
-insert into users_tenant_details (users_username, tenant_details_identifier) values ('dashaun', 'tenant0');
+insert into users_tenant_details (users_username, tenant_details_identifier) values ('catherine', 'petclinic');
+insert into users_tenant_details (users_username, tenant_details_identifier) values ('josh', 'acmewidgets');
+insert into users_tenant_details (users_username, tenant_details_identifier) values ('mala', 'coffeeshop');
+insert into users_tenant_details (users_username, tenant_details_identifier) values ('trisha', 'petclinic');
+insert into users_tenant_details (users_username, tenant_details_identifier) values ('james', 'acmewidgets');
+insert into users_tenant_details (users_username, tenant_details_identifier) values ('rob', 'coffeeshop');
+insert into users_tenant_details (users_username, tenant_details_identifier) values ('dashaun', 'petclinic');

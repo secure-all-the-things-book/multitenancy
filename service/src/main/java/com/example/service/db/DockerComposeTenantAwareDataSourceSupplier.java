@@ -5,6 +5,7 @@ import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.transport.DockerHttpClient;
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 class DockerComposeTenantAwareDataSourceSupplier
-        implements TenantAwareDataSourceSupplier {
+        implements TenantAwareDataSourceSupplier, InitializingBean {
 
     private final Map<String, String> registry = new ConcurrentHashMap<>();
 
@@ -29,10 +30,13 @@ class DockerComposeTenantAwareDataSourceSupplier
     private final DockerClientConfig dockerClientConfig;
 
     private final DataSourcePerTenantDataSource dataSource = new DataSourcePerTenantDataSource(tenantId -> {
-        this.refreshRegistry();
+        var url = registry.get(tenantId);
+        IO.println("given tenant " + tenantId + ", the url is " + url);
         return DataSourceBuilder
                 .create()
-                .url(registry.get(tenantId))
+                .url(url)
+                .username("myuser")
+                .password("secret")
                 .type(HikariDataSource.class)
                 .build();
     });
@@ -72,4 +76,8 @@ class DockerComposeTenantAwareDataSourceSupplier
         }
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        refreshRegistry();
+    }
 }
