@@ -1,6 +1,6 @@
 package com.example.service.db;
 
-import com.example.service.TenantAwareDataSourceSupplier;
+import com.example.service.DataSourceInitializer;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.transport.DockerHttpClient;
@@ -12,9 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-@Profile("db")
+//@Profile("db")
 @Configuration
 class DataSourceConfiguration {
 
@@ -31,19 +32,20 @@ class DataSourceConfiguration {
 	}
 
 	@Bean
-	TenantAwareDataSourceSupplier tenantAwareDataSourceSupplier(DockerDatabaseRegistry dockerDatabaseRegistry) {
-		return _ -> {
-			var stringDataSourceFunction = (Function<String, DataSource>) tenantId -> {
-				var url = dockerDatabaseRegistry.getDatasourceConnectionDetails(tenantId);
-				return DataSourceBuilder.create()
-					.url(url.getJdbcUrl())
-					.username(url.getUsername())
-					.password(url.getPassword())
-					.type(HikariDataSource.class)
-					.build();
-			};
-			return new DataSourcePerTenantDataSource(stringDataSourceFunction);
+	DataSource dataSource(DockerDatabaseRegistry dockerDatabaseRegistry, DataSourceInitializer dataSourceInitializer) {
+		var dsi = DataSourceInitializer.caching(dataSourceInitializer);
+		var stringDataSourceFunction = (Function<String, DataSource>) tenantId -> {
+			var url = dockerDatabaseRegistry.getDatasourceConnectionDetails(tenantId);
+			var db = DataSourceBuilder.create()
+				.url(url.getJdbcUrl())
+				.username(url.getUsername())
+				.password(url.getPassword())
+				.type(HikariDataSource.class)
+				.build();
+			dsi.initialize(tenantId, db);
+			return db;
 		};
+		return new DatabasePerTenantDataSource(stringDataSourceFunction);
 	}
 
 	@Bean

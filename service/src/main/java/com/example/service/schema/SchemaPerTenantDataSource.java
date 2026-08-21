@@ -1,5 +1,6 @@
 package com.example.service.schema;
 
+import com.example.service.DataSourceInitializer;
 import io.arconia.multitenancy.core.context.TenantContext;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.DelegatingDataSource;
@@ -11,30 +12,41 @@ import java.sql.SQLException;
 
 class SchemaPerTenantDataSource extends DelegatingDataSource {
 
-	SchemaPerTenantDataSource(DataSource dataSource) {
-		super(dataSource);
+	private final DataSourceInitializer compositeDataSourceInitializer;
+
+	SchemaPerTenantDataSource(DataSource target, DataSourceInitializer compositeDataSourceInitializer) {
+		this.compositeDataSourceInitializer = DataSourceInitializer.caching((tenant, ds) -> {
+			var jdbc = JdbcClient.create(ds);
+			var sql = " CREATE SCHEMA IF NOT EXISTS " + schemaForTenant();
+			jdbc.sql(sql).update();
+			IO.println(sql);
+			return compositeDataSourceInitializer.initialize(tenant, ds);
+		});
+		this.setTargetDataSource(target);
 	}
 
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
-		return this.doInit(super.getConnection(username, password), schemaForTenant());
+		var connection = super.getConnection(username, password);
+		return this.initialize(connection);
 	}
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		return this.doInit(super.getConnection(), schemaForTenant());
+		var connection = super.getConnection();
+		return this.initialize(connection);
 	}
 
-	private Connection doInit(Connection connection, String schemaName) throws SQLException {
-		try (var connectionDetailsDataSource = new SingleConnectionDataSource(connection, true)) {
-			var jdbc = JdbcClient.create(connectionDetailsDataSource);
-			jdbc.sql("CREATE SCHEMA IF NOT EXISTS  " + schemaName).update();
-		}
+	private Connection initialize(Connection connection) throws SQLException {
+		var dataSource = new SingleConnectionDataSource(connection, true);
+		var schemaName = this.schemaForTenant();
 		connection.setSchema(schemaName);
+		var tenantIdentifier = "" + TenantContext.getTenantIdentifier();
+		compositeDataSourceInitializer.initialize(tenantIdentifier, dataSource);
 		return connection;
 	}
 
-	private static String schemaForTenant() {
+	private String schemaForTenant() {
 		return "schema_" + TenantContext.getTenantIdentifier();
 	}
 
