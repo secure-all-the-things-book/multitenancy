@@ -1,25 +1,17 @@
 package com.example.service.db;
 
-import com.example.service.TenantAwareDataSourceSupplier;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.transport.DockerHttpClient;
-import com.zaxxer.hikari.HikariDataSource;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.jdbc.autoconfigure.JdbcConnectionDetails;
 
-import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * this returns a single {@link DataSource db} that in turn loads its DataSources
- * dynamically from a registry populated by information from the local Docker instance. We
- * could as easily use soemthing like Eureka, Consul, LDAP, etc.
- */
-class DockerComposeTenantAwareDataSourceSupplier implements TenantAwareDataSourceSupplier, InitializingBean {
+class DockerDatabaseRegistry implements DatabaseRegistry, InitializingBean {
 
 	private final Map<String, String> registry = new ConcurrentHashMap<>();
 
@@ -27,29 +19,33 @@ class DockerComposeTenantAwareDataSourceSupplier implements TenantAwareDataSourc
 
 	private final DockerClientConfig dockerClientConfig;
 
-	private final DataSourcePerTenantDataSource dataSource = new DataSourcePerTenantDataSource(tenantId -> {
-		var url = registry.get(tenantId);
-		IO.println("given tenant " + tenantId + ", the url is " + url);
-		return DataSourceBuilder.create()
-			.url(url)
-			.username("myuser")
-			.password("secret")
-			.type(HikariDataSource.class)
-			.build();
-	});
-
-	DockerComposeTenantAwareDataSourceSupplier(DockerHttpClient dockerHttpClient,
-			DockerClientConfig dockerClientConfig) {
+	DockerDatabaseRegistry(DockerHttpClient dockerHttpClient, DockerClientConfig dockerClientConfig) {
 		this.dockerHttpClient = dockerHttpClient;
 		this.dockerClientConfig = dockerClientConfig;
 	}
 
 	@Override
-	public DataSource apply(String tenantId) {
-		return this.dataSource;
+	public JdbcConnectionDetails get(String tenantId) {
+		return new JdbcConnectionDetails() {
+			@Override
+			public @Nullable String getUsername() {
+				return "myuser";
+			}
+
+			@Override
+			public @Nullable String getPassword() {
+				return "secret";
+			}
+
+			@Override
+			public String getJdbcUrl() {
+				return registry.get(tenantId);
+			}
+		};
 	}
 
-	private void refreshRegistry() {
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		try (var dockerClient = DockerClientImpl.getInstance(this.dockerClientConfig, this.dockerHttpClient)) {
 			var composeContainers = dockerClient.listContainersCmd()
 				.withShowAll(false) // Only running containers
@@ -66,14 +62,6 @@ class DockerComposeTenantAwareDataSourceSupplier implements TenantAwareDataSourc
 				}
 			}
 		} //
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		refreshRegistry();
 	}
 
 }
