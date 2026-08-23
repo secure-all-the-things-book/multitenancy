@@ -18,5 +18,4 @@ public class ServiceApplication {
 	OAuth2TenantResolver oauth2TenantResolver() {
 		return OAuth2TenantResolver.builder().tenantClaimName("tenant").build();
 	}
-
 }
