@@ -8,13 +8,11 @@ import org.springframework.cloud.gateway.server.mvc.filter.TokenRelayFilterFunct
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
 import static org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions.http;
 import static org.springframework.web.servlet.function.RouterFunctions.route;
-import static org.springframework.web.servlet.function.ServerResponse.*;
 
 @SpringBootApplication
 public class ClientApplication {
@@ -28,16 +26,21 @@ public class ClientApplication {
         return OAuth2TenantResolver.builder().tenantClaimName("tenant").build();
     }
 
+
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE)
-    RouterFunction<ServerResponse> uiRoutes() {
-        return route().GET("/**", http()).before(BeforeFilterFunctions.uri("http://localhost:8020")).build();
+    RouterFunction<ServerResponse> uiRoute() {
+        return route()
+                .GET("/**", http())
+                .before(BeforeFilterFunctions.uri("http://localhost:8020"))
+                .build();
     }
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    RouterFunction<ServerResponse> apiRoutes() {
-        return route().GET("/api/**", http())
+    RouterFunction<ServerResponse> apiRoute() {
+        return route()
+                .GET("/api/**", http())
                 .before(BeforeFilterFunctions.uri("http://localhost:8081"))
                 .before(BeforeFilterFunctions.rewritePath("/api", "/"))
                 .filter(TokenRelayFilterFunctions.tokenRelay())
@@ -45,3 +48,6 @@ public class ClientApplication {
     }
 
 }
+
+// :8080/index.html          => :8020/index.html
+// :8080/api/customers**     => :8081/customers
