@@ -26,7 +26,6 @@ public class ClientApplication {
         return OAuth2TenantResolver.builder().tenantClaimName("tenant").build();
     }
 
-
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE)
     RouterFunction<ServerResponse> uiRoute() {

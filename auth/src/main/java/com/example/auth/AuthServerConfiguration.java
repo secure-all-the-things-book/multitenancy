@@ -12,11 +12,13 @@ import javax.sql.DataSource;
 @Configuration
 class AuthServerConfiguration {
 
+	// <.>
 	@Bean
 	Customizer<HttpSecurity> customizer() {
 		return http -> http.oauth2AuthorizationServer(a -> a.oidc(Customizer.withDefaults()));
 	}
 
+	// <.>
 	@Bean
 	JdbcUserDetailsManager jdbcUserDetailsManager(DataSource dataSource) {
 		var u = new JdbcUserDetailsManager(dataSource);
@@ -24,6 +26,7 @@ class AuthServerConfiguration {
 		return u;
 	}
 
+	// <.>
 	@Bean
 	JdbcTenantDetailsService jdbcTenantDetails(DataSource dataSource) {
 		return JdbcTenantDetailsService.builder().dataSource(dataSource).build();
