@@ -13,13 +13,13 @@ import java.util.Map;
 @ResponseBody
 class TenantController {
 
-    @GetMapping("/")
-    Map<String, String> me() {
-        var contextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
-        return Map.of(//
-                "tenant", TenantContext.getTenantIdentifier(), //
-                "user", contextHolderStrategy.getContext().getAuthentication().getName() //
-        );
-    }
+	@GetMapping("/")
+	Map<String, String> me() {
+		var contextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+		return Map.of(//
+				"tenant", TenantContext.getTenantIdentifier(), //
+				"user", contextHolderStrategy.getContext().getAuthentication().getName() //
+		);
+	}
 
 }
