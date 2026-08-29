@@ -8,16 +8,16 @@ import java.util.Collection;
 @Repository
 class CustomerRepository {
 
-    private final JdbcClient db;
+	private final JdbcClient db;
 
-    CustomerRepository(JdbcClient db) {
-        this.db = db;
-    }
+	CustomerRepository(JdbcClient db) {
+		this.db = db;
+	}
 
-    Collection<Customer> findAll() {
-        return this.db
-                .sql("select * from customer")
-                .query((rs, _) -> new Customer(rs.getInt("id"), rs.getString("name")))
-                .list();
-    }
+	Collection<Customer> findAll() {
+		return this.db.sql("select * from customer")
+			.query((rs, _) -> new Customer(rs.getInt("id"), rs.getString("name")))
+			.list();
+	}
+
 }

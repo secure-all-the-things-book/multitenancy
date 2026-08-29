@@ -65,7 +65,6 @@
             <artifactId>docker-java-core</artifactId>
             <version>${docker-java.version}</version>
         </dependency>
-        <!-- Replace apache transport with zerodep -->
         <dependency>
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java-transport-zerodep</artifactId>

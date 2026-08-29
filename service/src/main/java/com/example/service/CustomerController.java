@@ -10,14 +10,15 @@ import java.util.Collection;
 @ResponseBody
 class CustomerController {
 
-    private final CustomerRepository repository;
+	private final CustomerRepository repository;
 
-    CustomerController(CustomerRepository repository) {
-        this.repository = repository;
-    }
+	CustomerController(CustomerRepository repository) {
+		this.repository = repository;
+	}
 
-    @GetMapping("/customers")
-    Collection<Customer> customers() {
-        return repository.findAll();
-    }
+	@GetMapping("/customers")
+	Collection<Customer> customers() {
+		return repository.findAll();
+	}
+
 }

@@ -7,8 +7,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 class ArconiaConfiguration {
 
-    @Bean
-    OAuth2TenantResolver oAuth2TenantResolver() {
-        return OAuth2TenantResolver.builder().tenantClaimName("tenant").build();
-    }
+	@Bean
+	OAuth2TenantResolver oAuth2TenantResolver() {
+		return OAuth2TenantResolver.builder().tenantClaimName("tenant").build();
+	}
+
 }

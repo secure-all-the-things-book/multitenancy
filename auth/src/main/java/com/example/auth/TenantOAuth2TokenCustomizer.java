@@ -17,7 +17,7 @@ class TenantOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingCo
 	@Override
 	public void customize(JwtEncodingContext context) {
 		// <.>
-        var tenant = this.db //
+		var tenant = this.db //
 			.sql(//
 					" select tenant_details_identifier from users_tenant_details utd  " + //
 							" where users_username = ? "//
@@ -25,8 +25,8 @@ class TenantOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingCo
 			.params(context.getPrincipal().getName())
 			.query((rs, _) -> rs.getString("tenant_details_identifier"))
 			.single();
-        // <.>
-        context.getClaims().claim("tenant", tenant);
-    }
+		// <.>
+		context.getClaims().claim("tenant", tenant);
+	}
 
 }

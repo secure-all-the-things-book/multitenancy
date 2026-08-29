@@ -12,12 +12,10 @@ import java.util.Map;
 @ResponseBody
 class TenantController {
 
-    @GetMapping("/")
-    Map<String, String> me() {
-        return Map.of("tenant", TenantContext.getTenantIdentifier(),
-                "user", SecurityContextHolder.getContextHolderStrategy()
-                        .getContext()
-                        .getAuthentication()
-                        .getName());
-    }
+	@GetMapping("/")
+	Map<String, String> me() {
+		return Map.of("tenant", TenantContext.getTenantIdentifier(), "user",
+				SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication().getName());
+	}
+
 }

@@ -87,7 +87,7 @@
             <groupId>io.arconia</groupId>
             <artifactId>arconia-multitenancy-details-jdbc</artifactId>
         </dependency>
-    <!--    <dependency>
+        <!--    <dependency>
             <groupId>io.arconia</groupId>
             <artifactId>arconia-multitenancy-data-jdbc</artifactId>
         </dependency>-->
