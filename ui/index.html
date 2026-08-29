@@ -29,6 +29,7 @@
 <div id="m"></div>
 
 <script type="module">
+    // <.>
     const response = await fetch('/api/customers')
     const customers = await response.json()
     m.append(...customers.map(({id, name}) => {
