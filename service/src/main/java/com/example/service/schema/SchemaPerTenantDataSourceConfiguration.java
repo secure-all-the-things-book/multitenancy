@@ -30,6 +30,7 @@ class SchemaPerTenantDataSourceConfiguration {
 		@Override
 		public @Nullable Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 			if (bean instanceof DataSource dataSource) {
+				// <.>
 				var dsi = this.dataSourceInitializer //
 					.get()
 					.getIfAvailable();
