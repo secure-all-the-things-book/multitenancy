@@ -12,27 +12,38 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import javax.sql.DataSource;
+import java.util.function.Function;
+
 // <.>
 @Profile("db")
 @Configuration
 class DatabasePerTenantConfiguration {
 
-	// <.>
 	@Bean
 	DatabasePerTenantDataSource dataSource(//
 			DataSourceInitializer dataSourceInitializer, //
 			DatabaseRegistry registry) {//
-		return new DatabasePerTenantDataSource(tenantId -> {
-			var dsi = DataSourceInitializers.caching(dataSourceInitializer);
-			var connectionDetails = registry.getConnectionDetails(tenantId);
+
+		// <.>
+		var initializer = DataSourceInitializers.caching(dataSourceInitializer);
+
+		// <.>
+		var dataSourceForTenantFunction = (Function<String, DataSource>) tenantId -> {
+
+			// <.>
+			var connectionDetails = registry //
+				.getConnectionDetails(tenantId);
 			var db = DataSourceBuilder.create()//
 				.url(connectionDetails.getJdbcUrl())//
 				.username(connectionDetails.getUsername())//
 				.password(connectionDetails.getPassword())//
 				.type(HikariDataSource.class)//
 				.build();
-			return dsi.initialize(tenantId, db);
-		});
+			// <.>
+			return initializer.initialize(tenantId, db);
+		};
+		return new DatabasePerTenantDataSource(dataSourceForTenantFunction);
 	}
 
 	// <.>
@@ -43,7 +54,6 @@ class DatabasePerTenantConfiguration {
 			.build();
 	}
 
-	// <.>
 	@Bean
 	ZerodepDockerHttpClient zerodepDockerHttpClient(DockerClientConfig config) {
 		return new ZerodepDockerHttpClient.Builder() //
@@ -52,7 +62,6 @@ class DatabasePerTenantConfiguration {
 			.build();
 	}
 
-	// <.>
 	@Bean
 	DockerDatabaseRegistry dockerDatabaseRegistry(DockerHttpClient httpClient, DockerClientConfig config) {
 		return new DockerDatabaseRegistry(httpClient, config);
