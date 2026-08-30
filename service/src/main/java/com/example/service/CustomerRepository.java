@@ -15,8 +15,11 @@ class CustomerRepository {
 	}
 
 	Collection<Customer> findAll() {
-		return this.db.sql("select * from customer")
-			.query((rs, _) -> new Customer(rs.getInt("id"), rs.getString("name")))
+		return this.db//
+			.sql("select * from customer") //
+			.query((rs, _) -> new Customer(rs.getInt("id"), //
+					rs.getString("name")) //
+			)//
 			.list();
 	}
 
