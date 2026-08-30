@@ -87,10 +87,6 @@
             <groupId>io.arconia</groupId>
             <artifactId>arconia-multitenancy-details-jdbc</artifactId>
         </dependency>
-        <!--    <dependency>
-            <groupId>io.arconia</groupId>
-            <artifactId>arconia-multitenancy-data-jdbc</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
