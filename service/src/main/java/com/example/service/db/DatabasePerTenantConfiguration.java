@@ -17,44 +17,45 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 class DatabasePerTenantConfiguration {
 
-    // <.>
-    @Bean
-    DatabasePerTenantDataSource dataSource(//
-            DataSourceInitializer dataSourceInitializer, //
-            DatabaseRegistry registry) {//
-        return new DatabasePerTenantDataSource(tenantId -> {
-            var dsi = DataSourceInitializers.caching(dataSourceInitializer);
-            var connectionDetails = registry.getConnectionDetails(tenantId);
-            var db = DataSourceBuilder.create()//
-                    .url(connectionDetails.getJdbcUrl())//
-                    .username(connectionDetails.getUsername())//
-                    .password(connectionDetails.getPassword())//
-                    .type(HikariDataSource.class)//
-                    .build();
-            return dsi.initialize(tenantId, db);
-        });
-    }
+	// <.>
+	@Bean
+	DatabasePerTenantDataSource dataSource(//
+			DataSourceInitializer dataSourceInitializer, //
+			DatabaseRegistry registry) {//
+		return new DatabasePerTenantDataSource(tenantId -> {
+			var dsi = DataSourceInitializers.caching(dataSourceInitializer);
+			var connectionDetails = registry.getConnectionDetails(tenantId);
+			var db = DataSourceBuilder.create()//
+				.url(connectionDetails.getJdbcUrl())//
+				.username(connectionDetails.getUsername())//
+				.password(connectionDetails.getPassword())//
+				.type(HikariDataSource.class)//
+				.build();
+			return dsi.initialize(tenantId, db);
+		});
+	}
 
-    // <.>
-    @Bean
-    DefaultDockerClientConfig dockerClientConfig() {
-        return DefaultDockerClientConfig//
-                .createDefaultConfigBuilder().build();
-    }
+	// <.>
+	@Bean
+	DefaultDockerClientConfig dockerClientConfig() {
+		return DefaultDockerClientConfig//
+			.createDefaultConfigBuilder()
+			.build();
+	}
 
-    // <.>
-    @Bean
-    ZerodepDockerHttpClient zerodepDockerHttpClient(DockerClientConfig config) {
-        return new ZerodepDockerHttpClient.Builder() //
-                .dockerHost(config.getDockerHost())//
-                .sslConfig(config.getSSLConfig())//
-                .build();
-    }
+	// <.>
+	@Bean
+	ZerodepDockerHttpClient zerodepDockerHttpClient(DockerClientConfig config) {
+		return new ZerodepDockerHttpClient.Builder() //
+			.dockerHost(config.getDockerHost())//
+			.sslConfig(config.getSSLConfig())//
+			.build();
+	}
 
-    // <.>
-    @Bean
-    DockerDatabaseRegistry dockerDatabaseRegistry(DockerHttpClient httpClient, DockerClientConfig config) {
-        return new DockerDatabaseRegistry(httpClient, config);
-    }
+	// <.>
+	@Bean
+	DockerDatabaseRegistry dockerDatabaseRegistry(DockerHttpClient httpClient, DockerClientConfig config) {
+		return new DockerDatabaseRegistry(httpClient, config);
+	}
 
 }

@@ -13,67 +13,67 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class DockerDatabaseRegistry implements DatabaseRegistry, InitializingBean {
 
-    private final DockerClientConfig dockerClientConfig;
+	private final DockerClientConfig dockerClientConfig;
 
-    private final Map<String, String> mapping = new ConcurrentHashMap<>();
+	private final Map<String, String> mapping = new ConcurrentHashMap<>();
 
-    private final DockerHttpClient dockerHttpClient;
+	private final DockerHttpClient dockerHttpClient;
 
-    DockerDatabaseRegistry(DockerHttpClient dockerHttpClient, DockerClientConfig dockerClientConfig) {
-        this.dockerClientConfig = dockerClientConfig;
-        this.dockerHttpClient = dockerHttpClient;
-    }
+	DockerDatabaseRegistry(DockerHttpClient dockerHttpClient, DockerClientConfig dockerClientConfig) {
+		this.dockerClientConfig = dockerClientConfig;
+		this.dockerHttpClient = dockerHttpClient;
+	}
 
-    @Override
-    public JdbcConnectionDetails getConnectionDetails(String tenantId) {
-        if (this.mapping.containsKey(tenantId)) {
-            return new JdbcConnectionDetails() {
-                @Override
-                public @Nullable String getUsername() {
-                    return "myuser";
-                }
+	@Override
+	public JdbcConnectionDetails getConnectionDetails(String tenantId) {
+		if (this.mapping.containsKey(tenantId)) {
+			return new JdbcConnectionDetails() {
+				@Override
+				public @Nullable String getUsername() {
+					return "myuser";
+				}
 
-                @Override
-                public @Nullable String getPassword() {
-                    return "secret";
-                }
+				@Override
+				public @Nullable String getPassword() {
+					return "secret";
+				}
 
-                @Override
-                public String getJdbcUrl() {
-                    return mapping.get(tenantId);
-                }
-            };
-        }
-        return null;
-    }
+				@Override
+				public String getJdbcUrl() {
+					return mapping.get(tenantId);
+				}
+			};
+		}
+		return null;
+	}
 
-    private void refresh() throws Exception {
+	private void refresh() throws Exception {
 
-        // <.>
-        try (var dockerClient = DockerClientImpl.getInstance(this.dockerClientConfig, this.dockerHttpClient)) {
-            var containers = dockerClient.listContainersCmd()
-                    .withShowAll(false)
-                    .withLabelFilter(List.of("com.docker.compose.service"))
-                    .exec();
-            for (var container : containers) {
-                var image = container.getImage();
-                if (image == null || !image.contains("postgres")) {
-                    continue;
-                }
-                var labels = container.getLabels();
-                var serviceName = labels.get("com.docker.compose.service");
-                var ports = container.getPorts();
-                for (var port : ports) {
-                    this.mapping.put(serviceName,
-                            "jdbc:postgresql://localhost:" + port.getPublicPort() + "/" + serviceName);
-                }
-            }
-        }
-    }
+		// <.>
+		try (var dockerClient = DockerClientImpl.getInstance(this.dockerClientConfig, this.dockerHttpClient)) {
+			var containers = dockerClient.listContainersCmd()
+				.withShowAll(false)
+				.withLabelFilter(List.of("com.docker.compose.service"))
+				.exec();
+			for (var container : containers) {
+				var image = container.getImage();
+				if (image == null || !image.contains("postgres")) {
+					continue;
+				}
+				var labels = container.getLabels();
+				var serviceName = labels.get("com.docker.compose.service");
+				var ports = container.getPorts();
+				for (var port : ports) {
+					this.mapping.put(serviceName,
+							"jdbc:postgresql://localhost:" + port.getPublicPort() + "/" + serviceName);
+				}
+			}
+		}
+	}
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        this.refresh();
-    }
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.refresh();
+	}
 
 }

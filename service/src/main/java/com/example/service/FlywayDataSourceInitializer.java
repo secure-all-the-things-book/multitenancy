@@ -8,14 +8,14 @@ import javax.sql.DataSource;
 @Component
 class FlywayDataSourceInitializer implements DataSourceInitializer {
 
-    @Override
-    public DataSource initialize(String tenantId, DataSource dataSource) {
-        Flyway.configure(getClass().getClassLoader())
-                .dataSource(dataSource)
-                .locations("classpath:db/tenants/common", "classpath:db/tenants/" + tenantId + "/")
-                .load()
-                .migrate();
-        return dataSource;
-    }
+	@Override
+	public DataSource initialize(String tenantId, DataSource dataSource) {
+		Flyway.configure(getClass().getClassLoader())
+			.dataSource(dataSource)
+			.locations("classpath:db/tenants/common", "classpath:db/tenants/" + tenantId + "/")
+			.load()
+			.migrate();
+		return dataSource;
+	}
 
 }

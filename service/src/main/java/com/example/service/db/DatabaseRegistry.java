@@ -4,6 +4,6 @@ import org.springframework.boot.jdbc.autoconfigure.JdbcConnectionDetails;
 
 interface DatabaseRegistry {
 
-    JdbcConnectionDetails getConnectionDetails(String tenantId);
+	JdbcConnectionDetails getConnectionDetails(String tenantId);
 
 }
