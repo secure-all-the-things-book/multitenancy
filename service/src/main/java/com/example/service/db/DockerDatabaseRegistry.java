@@ -24,17 +24,18 @@ class DockerDatabaseRegistry implements DatabaseRegistry, InitializingBean {
 		this.dockerHttpClient = dockerHttpClient;
 	}
 
+	@Nullable
 	@Override
 	public JdbcConnectionDetails getConnectionDetails(String tenantId) {
 		if (this.mapping.containsKey(tenantId)) {
 			return new JdbcConnectionDetails() {
 				@Override
-				public @Nullable String getUsername() {
+				public String getUsername() {
 					return "myuser";
 				}
 
 				@Override
-				public @Nullable String getPassword() {
+				public String getPassword() {
 					return "secret";
 				}
 

@@ -19,10 +19,7 @@ class TenantAwareRoutingDataSource extends DelegatingDataSource {
 		pfb.addInterface(XADataSource.class);
 		pfb.addInterface(DataSource.class);
 		pfb.addAdvice((MethodInterceptor) invocation -> {
-			resolved.compareAndSet(null, multitenantDataSource.get());// <.> defers
-																		// resolution to
-																		// the very last
-																		// minute!
+			resolved.compareAndSet(null, multitenantDataSource.get());// <.>
 			var tenantId = TenantContext.getTenantIdentifier();
 			var db = StringUtils.hasText(tenantId) ? resolved.get() : primary;
 			return invocation.getMethod().invoke(db, invocation.getArguments());
