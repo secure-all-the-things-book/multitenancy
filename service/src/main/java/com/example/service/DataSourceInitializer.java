@@ -4,10 +4,7 @@ import javax.sql.DataSource;
 
 public interface DataSourceInitializer {
 
-	DataSource initialize(String tenant, DataSource dataSource);
-
-	static DataSourceInitializer caching(DataSourceInitializer dataSourceInitializer) {
-		return new CachingDataSourceInitializer(dataSourceInitializer);
-	}
+	// <.>
+	DataSource initialize(String tenantId, DataSource dataSource);
 
 }

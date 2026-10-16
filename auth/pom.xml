@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.secureallthethingsbook</groupId>
     <artifactId>auth</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name/>
     <description/>
     <url/>
@@ -86,10 +86,6 @@
         <dependency>
             <groupId>io.arconia</groupId>
             <artifactId>arconia-multitenancy-details-jdbc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.arconia</groupId>
-            <artifactId>arconia-multitenancy-data-jdbc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

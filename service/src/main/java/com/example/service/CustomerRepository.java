@@ -2,24 +2,24 @@ package com.example.service;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
 @Repository
-@Transactional
 class CustomerRepository {
 
-	private final JdbcClient jdbcClient;
+	private final JdbcClient db;
 
-	CustomerRepository(JdbcClient jdbcClient) {
-		this.jdbcClient = jdbcClient;
+	CustomerRepository(JdbcClient db) {
+		this.db = db;
 	}
 
 	Collection<Customer> findAll() {
-		return this.jdbcClient //
-			.sql(" select * from customer ")//
-			.query((rs, _) -> new Customer(rs.getInt("id"), rs.getString("name")))//
+		return this.db//
+			.sql("select * from customer") //
+			.query((rs, _) -> new Customer(rs.getInt("id"), //
+					rs.getString("name")) //
+			)//
 			.list();
 	}
 

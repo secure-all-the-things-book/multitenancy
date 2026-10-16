@@ -1,4 +1,4 @@
 package com.example.service;
 
-public record Customer(int id, String name) {
+record Customer(int id, String name) {
 }

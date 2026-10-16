@@ -1,5 +1,5 @@
 services:
-
+  # <.>
   main:
     image: 'postgres:latest'
     environment:
@@ -9,6 +9,7 @@ services:
     ports:
       - '5432:5432'
 
+  # <.>
   petclinic:
     image: 'postgres:latest'
     environment:
