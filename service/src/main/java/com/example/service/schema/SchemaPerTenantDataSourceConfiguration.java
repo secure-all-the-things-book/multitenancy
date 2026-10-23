@@ -9,10 +9,13 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 import java.util.concurrent.atomic.AtomicReference;
 
+// <.>
+@Profile("!db")
 @Configuration
 class SchemaPerTenantDataSourceConfiguration {
 

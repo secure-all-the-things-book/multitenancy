@@ -9,18 +9,19 @@ import java.util.function.Supplier;
 
 class TenantAwareRoutingDataSourceBeanPostProcessor implements BeanPostProcessor {
 
-	private final Supplier<DataSource> dataSourceSupplier;
+	private final Supplier<DataSource> primary;
 
-	TenantAwareRoutingDataSourceBeanPostProcessor(Supplier<DataSource> dataSourceSupplier) {
-		this.dataSourceSupplier = dataSourceSupplier;
+	TenantAwareRoutingDataSourceBeanPostProcessor(Supplier<DataSource> primary) {
+		this.primary = primary;
 	}
 
 	@Override
 	public @Nullable Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		if (bean instanceof DataSource dataSource) {
-			return new TenantAwareRoutingDataSource(dataSource, this.dataSourceSupplier);
+		// <.>
+		if (bean instanceof DataSource multitenant) {
+			return new TenantAwareRoutingDataSource(multitenant, this.primary);
 		}
-		return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
+		return bean;
 	}
 
 }
