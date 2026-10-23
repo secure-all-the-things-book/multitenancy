@@ -3,32 +3,32 @@ insert into tenant_details (identifier) values ('acmewidgets'), ('coffeeshop'), 
 
 insert into tenant_details_attributes (tenant_id, attribute_name, attribute_value)
 select id, 'tier', 'xl' from tenant_details
-where identifier = 'tenant0' on conflict (tenant_id, attribute_name) do update set attribute_value = excluded.attribute_value;
+where identifier = 'acmewidgets' on conflict (tenant_id, attribute_name) do update set attribute_value = excluded.attribute_value;
 
 insert into tenant_details_attributes (tenant_id, attribute_name, attribute_value)
 select id, 'region', 'us-east-1' from tenant_details
-where identifier = 'tenant1' on conflict (tenant_id, attribute_name) do update set attribute_value = excluded.attribute_value;
+where identifier = 'coffeeshop' on conflict (tenant_id, attribute_name) do update set attribute_value = excluded.attribute_value;
 
 insert into tenant_details_attributes (tenant_id, attribute_name, attribute_value)
 select id, 'tier', 's' from tenant_details
-where identifier = 'tenant1' on conflict (tenant_id, attribute_name) do update set attribute_value = excluded.attribute_value;
+where identifier = 'coffeeshop' on conflict (tenant_id, attribute_name) do update set attribute_value = excluded.attribute_value;
 
 insert into tenant_details_attributes (tenant_id, attribute_name, attribute_value)
 select id, 'region', 'apj-west-2'
 from tenant_details
-where identifier = 'tenant0'
+where identifier = 'acmewidgets'
 on conflict (tenant_id, attribute_name) do update set attribute_value = excluded.attribute_value;
 
 insert into tenant_details_attributes (tenant_id, attribute_name, attribute_value)
 select id, 'tier', 's'
 from tenant_details
-where identifier = 'tenant2'
+where identifier = 'petclinic'
 on conflict (tenant_id, attribute_name) do update set attribute_value = excluded.attribute_value;
 
 insert into tenant_details_attributes (tenant_id, attribute_name, attribute_value)
 select id, 'region', 'eu-west-1'
 from tenant_details
-where identifier = 'tenant2'
+where identifier = 'petclinic'
 on conflict (tenant_id, attribute_name) do update set attribute_value = excluded.attribute_value;
 
 

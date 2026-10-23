@@ -10,9 +10,4 @@ public class ServiceApplication {
 		SpringApplication.run(ServiceApplication.class, args);
 	}
 
-	@Bean
-	OAuth2TenantResolver oauth2TenantResolver() {
-		return OAuth2TenantResolver.builder().tenantClaimName("tenant").build();
-	}
-
 }
