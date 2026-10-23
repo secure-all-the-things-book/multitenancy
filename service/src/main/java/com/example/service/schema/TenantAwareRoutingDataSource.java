@@ -1,4 +1,4 @@
-package com.example.service;
+package com.example.service.schema;
 
 import io.arconia.multitenancy.core.context.TenantContext;
 import org.springframework.jdbc.datasource.DelegatingDataSource;
@@ -10,19 +10,19 @@ import java.util.function.Supplier;
 
 class TenantAwareRoutingDataSource extends DelegatingDataSource {
 
-	private final Supplier<DataSource> primary;
+	private final Supplier<DataSource> multitenant;
 
 	// <.>
-	TenantAwareRoutingDataSource(DataSource multitenant, Supplier<DataSource> primary) {
-		super(multitenant);
-		this.primary = SingletonSupplier.of(primary);
+	TenantAwareRoutingDataSource(DataSource primary, Supplier<DataSource> multitenant) {
+		super(primary);
+		this.multitenant = SingletonSupplier.of(multitenant);
 	}
 
 	// <.>
 	@Override
 	protected DataSource obtainTargetDataSource() {
 		var tenantId = TenantContext.getTenantIdentifier();
-		return StringUtils.hasText(tenantId) ? super.obtainTargetDataSource() : this.primary.get();
+		return StringUtils.hasText(tenantId) ? this.multitenant.get() : super.obtainTargetDataSource();
 	}
 
 }

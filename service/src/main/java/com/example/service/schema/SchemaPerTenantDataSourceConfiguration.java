@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 import java.util.concurrent.atomic.AtomicReference;
 
 // <.>
-@Profile("!db")
+@Profile("schema")
 @Configuration
 class SchemaPerTenantDataSourceConfiguration {
 
